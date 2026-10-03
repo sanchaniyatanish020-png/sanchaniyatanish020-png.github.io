@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initScrollReveal();
     initBackToTop();
     initDynamicBackground();
+    initCustomCursor();
 });
 
 /* --------------------------------------------------------------------------
@@ -475,4 +476,81 @@ function initDynamicBackground() {
     if (!prefersReducedMotion) {
         animate();
     }
+}
+
+/* --------------------------------------------------------------------------
+   8. CUSTOM GLOWING INTERACTIVE CURSOR
+   -------------------------------------------------------------------------- */
+function initCustomCursor() {
+    const dot = document.getElementById("cursor-dot");
+    const ring = document.getElementById("cursor-ring");
+    if (!dot || !ring) return;
+
+    // Disable if user prefers reduced motion or is on touch device
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+        window.matchMedia("(hover: none) and (pointer: coarse)").matches) {
+        return;
+    }
+
+    let mouseX = -100;
+    let mouseY = -100;
+    let ringX = -100;
+    let ringY = -100;
+    let isMoving = false;
+
+    // Instant dot tracking & position update
+    window.addEventListener("mousemove", (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        
+        dot.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
+
+        if (!isMoving) {
+            document.body.classList.add("custom-cursor-active");
+            isMoving = true;
+            renderCursorRing();
+        }
+    });
+
+    // Smooth lerping loop for ring follower
+    function renderCursorRing() {
+        if (!isMoving) return;
+
+        ringX += (mouseX - ringX) * 0.18;
+        ringY += (mouseY - ringY) * 0.18;
+
+        ring.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%, -50%)`;
+
+        requestAnimationFrame(renderCursorRing);
+    }
+
+    // Hide cursor when mouse leaves document window
+    document.addEventListener("mouseleave", () => {
+        document.body.classList.remove("custom-cursor-active");
+        isMoving = false;
+    });
+
+    // Hover effect on interactive UI components
+    const interactiveSelectors = "a, button, input, textarea, select, .project-card, .project-featured-card, .skill-category-card, .highlight-card, .timeline-card, .btn, .nav-logo, .hamburger";
+    
+    document.addEventListener("mouseover", (e) => {
+        if (e.target.closest(interactiveSelectors)) {
+            document.body.classList.add("cursor-hover");
+        }
+    });
+
+    document.addEventListener("mouseout", (e) => {
+        if (e.target.closest(interactiveSelectors)) {
+            document.body.classList.remove("cursor-hover");
+        }
+    });
+
+    // Click pulse animation
+    window.addEventListener("mousedown", () => {
+        document.body.classList.add("cursor-click");
+    });
+
+    window.addEventListener("mouseup", () => {
+        document.body.classList.remove("cursor-click");
+    });
 }

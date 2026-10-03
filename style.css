@@ -187,6 +187,82 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* --------------------------------------------------------------------------
+   CUSTOM GLOWING INTERACTIVE CURSOR
+   -------------------------------------------------------------------------- */
+.cursor-dot {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 8px;
+    height: 8px;
+    background-color: var(--primary);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: opacity 0.3s ease, transform 0.15s ease-out, background-color 0.3s ease;
+    box-shadow: 0 0 10px rgba(37, 99, 235, 0.8);
+    opacity: 0;
+}
+
+.cursor-ring {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 38px;
+    height: 38px;
+    border: 2px solid rgba(37, 99, 235, 0.45);
+    background: rgba(37, 99, 235, 0.04);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                height 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 0.25s ease,
+                background-color 0.25s ease,
+                opacity 0.3s ease;
+    box-shadow: 0 0 18px rgba(37, 99, 235, 0.15);
+    backdrop-filter: blur(1px);
+    opacity: 0;
+}
+
+/* Hover active state over interactive elements */
+body.custom-cursor-active .cursor-dot,
+body.custom-cursor-active .cursor-ring {
+    opacity: 1;
+}
+
+.cursor-hover .cursor-dot {
+    transform: translate(-50%, -50%) scale(1.5);
+    background-color: var(--accent);
+    box-shadow: 0 0 14px rgba(124, 58, 237, 0.9);
+}
+
+.cursor-hover .cursor-ring {
+    width: 58px;
+    height: 58px;
+    border-color: var(--accent);
+    background-color: rgba(124, 58, 237, 0.08);
+    box-shadow: 0 0 25px rgba(124, 58, 237, 0.3);
+}
+
+/* Click Active Pulse */
+.cursor-click .cursor-ring {
+    transform: translate(-50%, -50%) scale(0.85);
+    border-color: var(--primary);
+    background-color: rgba(37, 99, 235, 0.25);
+}
+
+/* Hide custom cursor on mobile/touch devices */
+@media (hover: none) and (pointer: coarse) {
+    .cursor-dot,
+    .cursor-ring {
+        display: none !important;
+    }
+}
+
+/* --------------------------------------------------------------------------
    3. BUTTONS & UI UTILITIES
    -------------------------------------------------------------------------- */
 .btn {

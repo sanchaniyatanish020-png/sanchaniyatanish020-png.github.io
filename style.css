@@ -1641,6 +1641,10 @@ h1, h2, h3, h4, h5, h6 {
         padding: 0 0.85rem;
     }
 
+    .nav-logo {
+        font-size: 1.1rem;
+    }
+
     .hero-badge {
         font-size: 0.76rem;
         padding: 0.35rem 0.75rem;

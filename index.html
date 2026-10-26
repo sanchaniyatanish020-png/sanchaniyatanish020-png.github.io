@@ -18,10 +18,10 @@
 
     <!-- Font Awesome Icons & Devicon Tech Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicon/devicon@v2.15.1/devicon.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css">
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=3">
 </head>
 
 <body>
@@ -32,34 +32,38 @@
     <div class="bg-shape shape-3" aria-hidden="true"></div>
     <div class="bg-shape shape-4" aria-hidden="true"></div>
 
-    <!-- Custom Glowing Interactive Cursor -->
-    <div class="cursor-dot" id="cursor-dot" aria-hidden="true"></div>
-    <div class="cursor-ring" id="cursor-ring" aria-hidden="true"></div>
-
     <!-- Navigation Bar -->
     <header class="navbar" id="navbar">
         <div class="container nav-container">
-            <a href="#home" class="nav-logo" aria-label="Tanish Sanchaniya Home">
-                <span class="logo-badge">TS</span>
-                <span class="logo-text">Tanish Sanchaniya<span class="logo-dot">.</span></span>
-            </a>
 
-            <nav class="nav-menu" id="nav-menu">
-                <ul class="nav-list">
-                    <li><a href="#home" class="nav-link active"><i class="fa-solid fa-house"></i> Home</a></li>
-                    <li><a href="#about" class="nav-link"><i class="fa-solid fa-user"></i> About</a></li>
-                    <li><a href="#skills" class="nav-link"><i class="fa-solid fa-code"></i> Skills</a></li>
-                    <li><a href="#education" class="nav-link"><i class="fa-solid fa-graduation-cap"></i> Education</a>
-                    </li>
-                    <li><a href="#projects" class="nav-link"><i class="fa-solid fa-folder-open"></i> Projects</a></li>
-                    <li><a href="#contact" class="nav-link"><i class="fa-solid fa-envelope"></i> Contact</a></li>
+            <!-- Centered Nav Links -->
+            <nav class="nav-menu" id="nav-menu" aria-label="Primary navigation">
+                <ul class="nav-list" id="nav-list">
+                    <!-- Sliding soft hover/active pill indicator -->
+                    <span class="nav-active-pill" id="nav-active-pill" aria-hidden="true"></span>
+                    <li><a href="#home"      class="nav-link active" data-section="home">Home</a></li>
+                    <li><a href="#about"     class="nav-link"        data-section="about">About</a></li>
+                    <li><a href="#skills"    class="nav-link"        data-section="skills">Skills</a></li>
+                    <li><a href="#education" class="nav-link"        data-section="education">Education</a></li>
+                    <li><a href="#projects"  class="nav-link"        data-section="projects">Projects</a></li>
+                    <li><a href="#contact"   class="nav-link"        data-section="contact">Contact</a></li>
                 </ul>
             </nav>
 
+            <!-- Right-side Action Buttons -->
             <div class="nav-actions">
-                <a href="assets/resume/tanish_resume.pdf" target="_blank" class="btn btn-outline nav-resume-btn"
-                    download>
-                    <i class="fa-solid fa-download"></i> Download Resume
+
+                <button class="terminal-trigger-btn" id="terminal-trigger-btn"
+                    aria-label="Open CLI Terminal" title="Open Interactive Terminal">
+                    <i class="fa-solid fa-terminal"></i>
+                    <span class="terminal-btn-label">CLI</span>
+                </button>
+
+                <a href="assets/resume/tanish_resume.pdf" target="_blank"
+                    class="btn btn-primary nav-resume-btn" download
+                    aria-label="Download Resume">
+                    <i class="fa-solid fa-download"></i>
+                    <span>Resume</span>
                 </a>
 
                 <button class="hamburger" id="hamburger" aria-label="Toggle Navigation Menu">
@@ -68,6 +72,7 @@
                     <span></span>
                 </button>
             </div>
+
         </div>
     </header>
 
@@ -78,7 +83,10 @@
                 <div class="hero-content">
                     <div class="hero-badge">
                         <span class="status-dot"></span>
-                        <span>BCA 5th Semester Completed &bull; Aspiring Developer</span>
+                        <span>BCA 5th Semester Completed &bull; Open for Roles</span>
+                        <span class="live-clock-badge" id="live-clock-badge" title="Local Time in Surat, India (IST)">
+                            <i class="fa-regular fa-clock"></i> <span id="hero-clock">--:--:--</span> IST
+                        </span>
                     </div>
 
                     <h1 class="hero-title">
@@ -104,6 +112,9 @@
                         <a href="#projects" class="btn btn-secondary">
                             <i class="fa-solid fa-laptop-code"></i> Explore Projects
                         </a>
+                        <button class="btn btn-outline copy-email-btn" id="hero-copy-email-btn" title="Copy Email to Clipboard">
+                            <i class="fa-regular fa-copy"></i> Copy Email
+                        </button>
                     </div>
 
                     <div class="hero-socials">
@@ -399,6 +410,37 @@
                                     Object-Oriented Programming, Database Management Systems, Web Development, and
                                     Software Engineering principles.
                                 </p>
+
+                                <div class="sgpa-block">
+                                    <h5 class="sgpa-heading"><i class="fa-solid fa-chart-simple"></i> SGPA Performance</h5>
+                                    <div class="sgpa-grid">
+                                        <div class="sgpa-card">
+                                            <span class="sgpa-sem">Semester 1</span>
+                                            <span class="sgpa-score">7.82</span>
+                                            <span class="sgpa-scale">SGPA</span>
+                                        </div>
+                                        <div class="sgpa-card">
+                                            <span class="sgpa-sem">Semester 2</span>
+                                            <span class="sgpa-score">8.00</span>
+                                            <span class="sgpa-scale">SGPA</span>
+                                        </div>
+                                        <div class="sgpa-card">
+                                            <span class="sgpa-sem">Semester 3</span>
+                                            <span class="sgpa-score">8.00</span>
+                                            <span class="sgpa-scale">SGPA</span>
+                                        </div>
+                                        <div class="sgpa-card">
+                                            <span class="sgpa-sem">Semester 4</span>
+                                            <span class="sgpa-score">7.91</span>
+                                            <span class="sgpa-scale">SGPA</span>
+                                        </div>
+                                        <div class="sgpa-card sgpa-card--pending">
+                                            <span class="sgpa-sem">Semester 5</span>
+                                            <span class="sgpa-score">Pending</span>
+                                            <span class="sgpa-scale">Result Awaited</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -417,9 +459,25 @@
                     <div class="title-underline"></div>
                 </div>
 
+                <!-- PROJECT FILTER & SEARCH CONTROLS -->
+                <div class="project-controls-wrapper">
+                    <div class="project-search-box">
+                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <input type="text" id="project-search-input" placeholder="Search projects by title or tech (React, PHP, Node, ASP.NET...)" aria-label="Search projects">
+                        <button id="search-clear-btn" class="search-clear-btn" aria-label="Clear search"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+
+                    <div class="project-filter-tabs" id="project-filter-tabs">
+                        <button class="filter-tab active" data-filter="all"><i class="fa-solid fa-list-ul"></i> All Projects</button>
+                        <button class="filter-tab" data-filter="fullstack"><i class="fa-solid fa-layer-group"></i> Full-Stack</button>
+                        <button class="filter-tab" data-filter="web"><i class="fa-solid fa-globe"></i> Web Apps</button>
+                        <button class="filter-tab" data-filter="wip"><i class="fa-solid fa-spinner"></i> In Progress</button>
+                    </div>
+                </div>
+
                 <div class="projects-wrapper">
                     <!-- MAIN FEATURED PROJECT: Library Management System -->
-                    <div class="project-featured-card">
+                    <div class="project-featured-card" data-category="fullstack" data-tech="asp.net php mysql react node mongodb html css library management">
                         <div class="featured-ribbon">
                             <i class="fa-solid fa-star"></i> Featured Main Project
                         </div>
@@ -466,6 +524,9 @@
                                         rel="noopener noreferrer" class="btn btn-primary">
                                         <i class="fa-brands fa-github"></i> View GitHub Repository
                                     </a>
+                                    <button class="btn btn-outline quick-view-btn" data-project="library">
+                                        <i class="fa-solid fa-circle-info"></i> Quick Overview
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -474,7 +535,7 @@
                     <!-- SECONDARY PROJECTS GRID -->
                     <div class="secondary-projects-grid">
                         <!-- Project 2: Personal Portfolio Website -->
-                        <div class="project-card">
+                        <div class="project-card" data-category="web" data-tech="html css javascript portfolio interactive frontend">
                             <div class="project-card-header">
                                 <span class="project-status status-completed"><i class="fa-solid fa-check"></i>
                                     Completed</span>
@@ -499,31 +560,44 @@
                                     rel="noopener noreferrer" class="btn btn-outline btn-sm">
                                     <i class="fa-brands fa-github"></i> GitHub Code
                                 </a>
+                                <button class="btn btn-primary btn-sm quick-view-btn" data-project="portfolio">
+                                    <i class="fa-solid fa-eye"></i> Details
+                                </button>
                             </div>
                         </div>
 
                         <!-- Project 3: Nehvisa Holidays -->
-                        <div class="project-card">
+                        <div class="project-card" data-category="web" data-tech="react vite javascript html5 css3 travel agency nehvisa holidays tours booking surat domestic international web">
                             <div class="project-card-header">
-                                <span class="project-status status-wip"><i class="fa-solid fa-spinner fa-spin"></i> In
-                                    Development</span>
+                                <span class="project-status status-completed"><i class="fa-solid fa-check"></i>
+                                    Completed & Live</span>
                                 <h3 class="project-card-title">Nehvisa Holidays</h3>
                             </div>
 
                             <p class="project-card-desc">
-                                A travel website currently under development.
+                                Best Travel Agency in Surat offering domestic & international tours, custom holiday packages, flight & hotel bookings, and travel consultation built with React & Vite.
                             </p>
 
                             <div class="tech-stack-badges">
-                                <span class="tech-badge"><i class="fa-solid fa-plane"></i> Travel Platform</span>
-                                <span class="tech-badge"><i class="fa-solid fa-clock"></i> In Progress</span>
+                                <span class="tech-badge"><i class="devicon-react-original colored"></i> React</span>
+                                <span class="tech-badge"><i class="devicon-vitejs-plain colored"></i> Vite</span>
+                                <span class="tech-badge"><i class="devicon-javascript-plain colored"></i> JavaScript</span>
+                                <span class="tech-badge"><i class="devicon-html5-plain colored"></i> HTML5</span>
+                                <span class="tech-badge"><i class="devicon-css3-plain colored"></i> CSS3</span>
                             </div>
 
                             <div class="project-card-footer">
+                                <a href="https://nehvisa-holiday.netlify.app/" target="_blank"
+                                    rel="noopener noreferrer" class="btn btn-primary btn-sm">
+                                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Live Demo
+                                </a>
                                 <a href="https://github.com/sanchaniyatanish020-png" target="_blank"
                                     rel="noopener noreferrer" class="btn btn-outline btn-sm">
-                                    <i class="fa-brands fa-github"></i> GitHub Profile
+                                    <i class="fa-brands fa-github"></i> GitHub
                                 </a>
+                                <button class="btn btn-secondary btn-sm quick-view-btn" data-project="nehvisa">
+                                    <i class="fa-solid fa-eye"></i> Details
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -551,15 +625,20 @@
                         </p>
 
                         <div class="info-list">
-                            <a href="mailto:sanchaniyatanish020@gmail.com" class="info-item">
-                                <div class="info-icon">
-                                    <i class="fa-solid fa-envelope"></i>
-                                </div>
-                                <div>
-                                    <span class="info-label">Email</span>
-                                    <span class="info-val">sanchaniyatanish020@gmail.com</span>
-                                </div>
-                            </a>
+                            <div class="info-item info-item-email">
+                                <a href="mailto:sanchaniyatanish020@gmail.com" class="info-link">
+                                    <div class="info-icon">
+                                        <i class="fa-solid fa-envelope"></i>
+                                    </div>
+                                    <div>
+                                        <span class="info-label">Email</span>
+                                        <span class="info-val">sanchaniyatanish020@gmail.com</span>
+                                    </div>
+                                </a>
+                                <button class="copy-email-sub-btn" id="contact-copy-email-btn" title="Copy Email to Clipboard">
+                                    <i class="fa-regular fa-copy"></i>
+                                </button>
+                            </div>
 
                             <a href="tel:87584498557" class="info-item">
                                 <div class="info-icon">
@@ -662,8 +741,55 @@
         <i class="fa-solid fa-arrow-up"></i>
     </button>
 
+    <!-- INTERACTIVE CLI TERMINAL MODAL -->
+    <div id="terminal-modal" class="terminal-modal-overlay" aria-hidden="true">
+        <div class="terminal-container">
+            <div class="terminal-header">
+                <div class="terminal-dots">
+                    <span class="dot dot-close" id="terminal-close-dot" title="Close"></span>
+                    <span class="dot dot-minimize"></span>
+                    <span class="dot dot-maximize"></span>
+                </div>
+                <div class="terminal-title">
+                    <i class="fa-solid fa-terminal"></i> tanish@dev:~$ (Portfolio CLI v2.0)
+                </div>
+                <button class="terminal-close-btn" id="terminal-close-btn" aria-label="Close Terminal">&times;</button>
+            </div>
+            <div class="terminal-body" id="terminal-body">
+                <div class="terminal-line welcome-msg">
+                    👋 Welcome to Tanish Sanchaniya's Interactive CLI Console!<br>
+                    Type <span class="cmd-highlight">help</span> to explore commands or click quick actions below.
+                </div>
+                <div class="terminal-quick-actions">
+                    <button class="quick-cmd-btn" data-cmd="help">help</button>
+                    <button class="quick-cmd-btn" data-cmd="about">about</button>
+                    <button class="quick-cmd-btn" data-cmd="skills">skills</button>
+                    <button class="quick-cmd-btn" data-cmd="projects">projects</button>
+                    <button class="quick-cmd-btn" data-cmd="hire">hire</button>
+                    <button class="quick-cmd-btn" data-cmd="clear">clear</button>
+                </div>
+                <div id="terminal-output"></div>
+                <div class="terminal-input-line">
+                    <span class="prompt">tanish@dev:~$</span>
+                    <input type="text" id="terminal-input" placeholder="Type command (e.g. help, skills)..." autocomplete="off" spellcheck="false">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PROJECT QUICK VIEW MODAL -->
+    <div id="project-modal" class="project-modal-overlay" aria-hidden="true">
+        <div class="project-modal-card">
+            <button class="project-modal-close" id="project-modal-close" aria-label="Close Modal">&times;</button>
+            <div id="project-modal-content"></div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION SYSTEM CONTAINER -->
+    <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
     <!-- Custom Script -->
-    <script src="script.js"></script>
+    <script src="script.js?v=3"></script>
 </body>
 
 </html>

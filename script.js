@@ -4,12 +4,17 @@
 
 document.addEventListener("DOMContentLoaded", () => {
     initTypewriter();
+    initNavPill();
     initScrollSpy();
     initMobileNav();
     initScrollReveal();
     initBackToTop();
     initDynamicBackground();
-    initCustomCursor();
+    initLiveClock();
+    initCopyEmail();
+    initProjectFilter();
+    initProjectModal();
+    initTerminal();
 });
 
 /* --------------------------------------------------------------------------
@@ -69,32 +74,31 @@ function initScrollSpy() {
     const sections = document.querySelectorAll("section[id]");
     const navLinks = document.querySelectorAll(".nav-link");
 
-    window.addEventListener("scroll", () => {
+    function updateActiveLink() {
         const scrollY = window.scrollY;
 
-        // Navbar Shadow on scroll
-        if (scrollY > 50) {
-            navbar?.classList.add("scrolled");
-        } else {
-            navbar?.classList.remove("scrolled");
-        }
+        // Navbar shadow on scroll
+        navbar?.classList.toggle("scrolled", scrollY > 50);
 
-        // Active Link Highlight
-        sections.forEach((current) => {
-            const sectionHeight = current.offsetHeight;
-            const sectionTop = current.offsetTop - 100;
-            const sectionId = current.getAttribute("id");
-
-            if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
-                navLinks.forEach((link) => {
-                    link.classList.remove("active");
-                    if (link.getAttribute("href") === `#${sectionId}`) {
-                        link.classList.add("active");
-                    }
-                });
+        // Determine active section
+        let activeSectionId = null;
+        sections.forEach((section) => {
+            const top = section.offsetTop - 110;
+            if (scrollY >= top && scrollY < top + section.offsetHeight) {
+                activeSectionId = section.getAttribute("id");
             }
         });
-    });
+
+        navLinks.forEach((link) => {
+            const isActive = link.getAttribute("href") === `#${activeSectionId}`;
+            link.classList.toggle("active", isActive);
+        });
+
+        updatePill();
+    }
+
+    window.addEventListener("scroll", updateActiveLink, { passive: true });
+    updateActiveLink(); // run once on load
 }
 
 /* --------------------------------------------------------------------------
@@ -102,22 +106,109 @@ function initScrollSpy() {
    -------------------------------------------------------------------------- */
 function initMobileNav() {
     const hamburger = document.getElementById("hamburger");
-    const navMenu = document.getElementById("nav-menu");
-    const navLinks = document.querySelectorAll(".nav-link");
+    const navMenu   = document.getElementById("nav-menu");
+    const navLinks  = document.querySelectorAll(".nav-link");
+
+    function openMenu() {
+        navMenu?.classList.add("active");
+        hamburger?.classList.add("active");
+        document.body.style.overflow = "hidden";
+    }
+
+    function closeMenu() {
+        navMenu?.classList.remove("active");
+        hamburger?.classList.remove("active");
+        document.body.style.overflow = "";
+    }
 
     hamburger?.addEventListener("click", () => {
-        const isActive = navMenu?.classList.toggle("active");
-        hamburger.classList.toggle("active");
-        document.body.style.overflow = isActive ? "hidden" : "";
+        navMenu?.classList.contains("active") ? closeMenu() : openMenu();
     });
 
+    // Close when a link is clicked
+    navLinks.forEach((link) => link.addEventListener("click", closeMenu));
+
+    // Close on Escape key
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeMenu();
+    });
+
+    // Close on outside click (clicking the overlay backdrop)
+    navMenu?.addEventListener("click", (e) => {
+        if (e.target === navMenu) closeMenu();
+    });
+}
+
+/* --------------------------------------------------------------------------
+   3b. NAV PILL INDICATOR — slides smoothly on hover & tracks active link
+   -------------------------------------------------------------------------- */
+let isHoveringNav = false;
+
+function initNavPill() {
+    const pill = document.getElementById("nav-active-pill");
+    const navList = document.querySelector(".nav-list");
+    const navLinks = document.querySelectorAll(".nav-link");
+
+    if (!pill || !navList) return;
+
+    // Hover effect: glide pill to whatever link is hovered
     navLinks.forEach((link) => {
-        link.addEventListener("click", () => {
-            navMenu?.classList.remove("active");
-            hamburger?.classList.remove("active");
-            document.body.style.overflow = "";
+        link.addEventListener("mouseenter", () => {
+            isHoveringNav = true;
+            movePillTo(link);
         });
     });
+
+    // Return to the active section link when mouse leaves the navbar
+    navList.addEventListener("mouseleave", () => {
+        isHoveringNav = false;
+        updatePill();
+    });
+
+    window.addEventListener("resize", () => {
+        if (!isHoveringNav) updatePill();
+    });
+
+    // Initial position after render
+    setTimeout(updatePill, 100);
+}
+
+function movePillTo(targetLink) {
+    const pill = document.getElementById("nav-active-pill");
+    const navList = document.querySelector(".nav-list");
+    const navLinks = document.querySelectorAll(".nav-link");
+
+    if (!pill || !navList || !targetLink) return;
+    if (window.innerWidth <= 768) {
+        pill.style.opacity = "0";
+        navLinks.forEach(l => l.classList.remove("has-pill"));
+        return;
+    }
+
+    const listRect = navList.getBoundingClientRect();
+    const targetRect = targetLink.getBoundingClientRect();
+
+    pill.style.width = `${targetRect.width}px`;
+    pill.style.height = `${targetRect.height}px`;
+    pill.style.left = `${targetRect.left - listRect.left}px`;
+    pill.style.top = `${targetRect.top - listRect.top}px`;
+    pill.style.opacity = "1";
+
+    // Apply white text ONLY to the tab currently covered by the pill
+    navLinks.forEach((link) => {
+        if (link === targetLink) {
+            link.classList.add("has-pill");
+        } else {
+            link.classList.remove("has-pill");
+        }
+    });
+}
+
+function updatePill() {
+    if (isHoveringNav) return; // Don't interrupt hover glide
+    const navList = document.querySelector(".nav-list");
+    const active = navList?.querySelector(".nav-link.active") || navList?.querySelector(".nav-link");
+    movePillTo(active);
 }
 
 /* --------------------------------------------------------------------------
@@ -252,13 +343,6 @@ function initDynamicBackground() {
     let particles = [];
     let animationFrameId = null;
 
-    // Mouse position tracking
-    const mouse = {
-        x: null,
-        y: null,
-        radius: 150,
-        active: false
-    };
 
     // Color palette for particles matching portfolio branding (Blue, Violet, Cyan, Indigo)
     const colors = [
@@ -304,27 +388,7 @@ function initDynamicBackground() {
             this.x += this.vx;
             this.y += this.vy;
 
-            // Interactive mouse attraction / repulsion & size glow
-            if (mouse.active && mouse.x !== null && mouse.y !== null) {
-                const dx = mouse.x - this.x;
-                const dy = mouse.y - this.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-
-                if (dist < mouse.radius) {
-                    const force = (mouse.radius - dist) / mouse.radius;
-                    // Gentle push outward from cursor
-                    this.x -= (dx / dist) * force * 1.5;
-                    this.y -= (dy / dist) * force * 1.5;
-
-                    // Expand particle when mouse is close
-                    this.radius = this.baseRadius + force * 2.5;
-                    this.alpha = Math.min(0.85, this.baseAlpha + force * 0.4);
-                } else {
-                    this.radius += (this.baseRadius - this.radius) * 0.08;
-                }
-            } else {
-                this.radius += (this.baseRadius - this.radius) * 0.08;
-            }
+            this.radius += (this.baseRadius - this.radius) * 0.08;
 
             // Screen edge boundary wrapping
             if (this.x < -20) this.x = width + 20;
@@ -392,26 +456,6 @@ function initDynamicBackground() {
                     ctx.stroke();
                 }
             }
-
-            // Connect node to mouse pointer
-            if (mouse.active && mouse.x !== null && mouse.y !== null) {
-                const dx = p1.x - mouse.x;
-                const dy = p1.y - mouse.y;
-                const distSq = dx * dx + dy * dy;
-                const mouseMaxDist = mouse.radius;
-
-                if (distSq < mouseMaxDist * mouseMaxDist) {
-                    const dist = Math.sqrt(distSq);
-                    const alpha = (1 - dist / mouseMaxDist) * 0.32;
-
-                    ctx.beginPath();
-                    ctx.moveTo(p1.x, p1.y);
-                    ctx.lineTo(mouse.x, mouse.y);
-                    ctx.strokeStyle = `rgba(${p1.color.r}, ${p1.color.g}, ${p1.color.b}, ${alpha})`;
-                    ctx.lineWidth = 1.2;
-                    ctx.stroke();
-                }
-            }
         }
     }
 
@@ -435,32 +479,6 @@ function initDynamicBackground() {
         resizeTimeout = setTimeout(resizeCanvas, 100);
     });
 
-    window.addEventListener("mousemove", (e) => {
-        mouse.x = e.clientX;
-        mouse.y = e.clientY;
-        mouse.active = true;
-    });
-
-    window.addEventListener("mouseleave", () => {
-        mouse.active = false;
-        mouse.x = null;
-        mouse.y = null;
-    });
-
-    // Touch interaction for mobile browsers
-    window.addEventListener("touchmove", (e) => {
-        if (e.touches.length > 0) {
-            mouse.x = e.touches[0].clientX;
-            mouse.y = e.touches[0].clientY;
-            mouse.active = true;
-        }
-    }, { passive: true });
-
-    window.addEventListener("touchend", () => {
-        mouse.active = false;
-        mouse.x = null;
-        mouse.y = null;
-    });
 
     // Performance optimization: Pause rendering when page is hidden
     document.addEventListener("visibilitychange", () => {
@@ -478,79 +496,438 @@ function initDynamicBackground() {
     }
 }
 
+
 /* --------------------------------------------------------------------------
-   8. CUSTOM GLOWING INTERACTIVE CURSOR
+   9. REAL-TIME SURAT (IST) CLOCK
    -------------------------------------------------------------------------- */
-function initCustomCursor() {
-    const dot = document.getElementById("cursor-dot");
-    const ring = document.getElementById("cursor-ring");
-    if (!dot || !ring) return;
+function initLiveClock() {
+    const clockEl = document.getElementById("hero-clock");
+    if (!clockEl) return;
 
-    // Disable if user prefers reduced motion or is on touch device
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
-        window.matchMedia("(hover: none) and (pointer: coarse)").matches) {
-        return;
+    function updateClock() {
+        const now = new Date();
+        const options = {
+            timeZone: "Asia/Kolkata",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: true
+        };
+        const timeString = new Intl.DateTimeFormat("en-US", options).format(now);
+        clockEl.textContent = timeString;
     }
 
-    let mouseX = -100;
-    let mouseY = -100;
-    let ringX = -100;
-    let ringY = -100;
-    let isMoving = false;
+    updateClock();
+    setInterval(updateClock, 1000);
+}
 
-    // Instant dot tracking & position update
-    window.addEventListener("mousemove", (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
+/* --------------------------------------------------------------------------
+   10. TOAST NOTIFICATION SYSTEM
+   -------------------------------------------------------------------------- */
+function showToast(message, type = "info", duration = 3200) {
+    const container = document.getElementById("toast-container");
+    if (!container) return;
+
+    const toast = document.createElement("div");
+    toast.className = `toast toast-${type}`;
+
+    let iconHtml = '<i class="fa-solid fa-circle-info"></i>';
+    if (type === "success") iconHtml = '<i class="fa-solid fa-circle-check"></i>';
+    if (type === "warning") iconHtml = '<i class="fa-solid fa-triangle-exclamation"></i>';
+
+    toast.innerHTML = `${iconHtml} <span>${message}</span>`;
+    container.appendChild(toast);
+
+    requestAnimationFrame(() => {
+        toast.classList.add("show");
+    });
+
+    setTimeout(() => {
+        toast.classList.remove("show");
+        toast.addEventListener("transitionend", () => {
+            toast.remove();
+        });
+    }, duration);
+}
+
+/* --------------------------------------------------------------------------
+   11. 1-CLICK EMAIL CLIPBOARD COPY
+   -------------------------------------------------------------------------- */
+function initCopyEmail() {
+    const email = "sanchaniyatanish020@gmail.com";
+    const heroBtn = document.getElementById("hero-copy-email-btn");
+    const contactBtn = document.getElementById("contact-copy-email-btn");
+
+    function copyAction(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        navigator.clipboard.writeText(email).then(() => {
+            showToast("📋 Email copied to clipboard!", "success");
+        }).catch(() => {
+            showToast(`Email: ${email}`, "info");
+        });
+    }
+
+    heroBtn?.addEventListener("click", copyAction);
+    contactBtn?.addEventListener("click", copyAction);
+}
+
+/* --------------------------------------------------------------------------
+   12. PROJECT FILTERING & REAL-TIME SEARCH
+   -------------------------------------------------------------------------- */
+function initProjectFilter() {
+    const filterTabs = document.querySelectorAll(".filter-tab");
+    const searchInput = document.getElementById("project-search-input");
+    const clearBtn = document.getElementById("search-clear-btn");
+    const projectCards = document.querySelectorAll(".project-featured-card, .project-card");
+
+    let activeFilter = "all";
+    let searchQuery = "";
+
+    function filterProjects() {
+        projectCards.forEach((card) => {
+            const category = card.getAttribute("data-category") || "";
+            const tech = (card.getAttribute("data-tech") || "").toLowerCase();
+            const textContent = card.textContent.toLowerCase();
+
+            const matchesCategory = activeFilter === "all" || category === activeFilter;
+            const matchesSearch = !searchQuery || tech.includes(searchQuery) || textContent.includes(searchQuery);
+
+            if (matchesCategory && matchesSearch) {
+                card.style.display = "";
+                card.classList.remove("hidden-project");
+            } else {
+                card.style.display = "none";
+                card.classList.add("hidden-project");
+            }
+        });
+
+        if (clearBtn) {
+            clearBtn.style.display = searchQuery ? "flex" : "none";
+        }
+    }
+
+    filterTabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
+            filterTabs.forEach((t) => t.classList.remove("active"));
+            tab.classList.add("active");
+            activeFilter = tab.getAttribute("data-filter");
+            filterProjects();
+        });
+    });
+
+    searchInput?.addEventListener("input", (e) => {
+        searchQuery = e.target.value.trim().toLowerCase();
+        filterProjects();
+    });
+
+    clearBtn?.addEventListener("click", () => {
+        if (searchInput) searchInput.value = "";
+        searchQuery = "";
+        filterProjects();
+    });
+}
+
+/* --------------------------------------------------------------------------
+   13. PROJECT QUICK VIEW MODAL
+   -------------------------------------------------------------------------- */
+function initProjectModal() {
+    const modal = document.getElementById("project-modal");
+    const modalContent = document.getElementById("project-modal-content");
+    const closeBtn = document.getElementById("project-modal-close");
+    const viewBtns = document.querySelectorAll(".quick-view-btn");
+
+    const projectsData = {
+        library: {
+            title: "Library Management System",
+            category: "Full-Stack System",
+            status: "Completed across 3 Stacks",
+            description: "An enterprise-grade academic project created to manage book cataloging, user membership, loan tracking, reserves, and administrator dashboards across multiple technology approaches.",
+            stacks: [
+                { name: "ASP.NET Edition", desc: "C# backend with SQL Server database & Razor UI components." },
+                { name: "PHP & MySQL Edition", desc: "Classic LAMP stack architecture with relational database queries." },
+                { name: "MERN Stack Edition", desc: "Modern React SPA frontend, Node.js/Express REST APIs, and MongoDB database." }
+            ],
+            features: [
+                "Role-based authentication (Admin & User)",
+                "Book search, pagination & dynamic category filtering",
+                "Issue / Return tracking with automated fine calculation",
+                "User book reservation & request approval flow",
+                "Analytics dashboard for total books, active loans & overdue alerts"
+            ],
+            link: "https://github.com/sanchaniyatanish020-png"
+        },
+        portfolio: {
+            title: "Personal Developer Portfolio",
+            category: "Frontend Web Application",
+            status: "Live & Active",
+            description: "A custom-built, responsive portfolio website featuring fluid ambient animations, theme switching (Light/Dark), real-time project searching, interactive CLI terminal, and clean semantic architecture.",
+            stacks: [
+                { name: "Core Stack", desc: "HTML5, Vanilla CSS3 (Custom Glassmorphism), ES6+ JavaScript" },
+                { name: "Libraries", desc: "Font Awesome 6, Devicon, Google Fonts" }
+            ],
+            features: [
+                "Interactive CLI terminal drawer with fun commands",
+                "Theme toggle with LocalStorage state persistence",
+                "Real-time IST Surat local time clock badge",
+                "1-Click Copy Email & Toast Notification feedback",
+                "Filterable project matrix and search bar"
+            ],
+            link: "https://github.com/sanchaniyatanish020-png"
+        },
+        nehvisa: {
+            title: "Nehvisa Holidays | Best Travel Agency in Surat",
+            category: "Web Application (React + Vite)",
+            status: "Completed & Live",
+            description: "A complete, live responsive travel agency web platform for Nehvisa Holidays built using React and Vite. Offers domestic and international tour packages, destination highlights, hotel & transport arrangements, and instant customer booking inquiry integration.",
+            stacks: [
+                { name: "Frontend Framework", desc: "React with modular component architecture" },
+                { name: "Build Tool & Bundler", desc: "Vite (Fast Hot Module Replacement & optimized build)" },
+                { name: "Core Languages", desc: "JavaScript (ES6+), HTML5, CSS3" },
+                { name: "Deployment", desc: "Netlify Production Hosting with Continuous Deployment" }
+            ],
+            features: [
+                "Domestic & International tour packages showcase",
+                "Built with React and Vite for blazing-fast page loads and smooth navigation",
+                "Mobile-first responsive design tailored for fast mobile browsing",
+                "Direct WhatsApp inquiry and quick booking contact integration",
+                "Destination highlights, detailed itineraries, and travel consultation"
+            ],
+            liveUrl: "https://nehvisa-holiday.netlify.app/",
+            link: "https://github.com/sanchaniyatanish020-png"
+        }
+    };
+
+    function openModal(projectId) {
+        const data = projectsData[projectId];
+        if (!data || !modal || !modalContent) return;
+
+        let stacksHtml = data.stacks.map(s => `
+            <div class="modal-stack-item">
+                <strong><i class="fa-solid fa-layer-group"></i> ${s.name}:</strong> ${s.desc}
+            </div>
+        `).join("");
+
+        let featuresHtml = data.features.map(f => `
+            <li><i class="fa-solid fa-circle-check"></i> ${f}</li>
+        `).join("");
+
+        modalContent.innerHTML = `
+            <span class="modal-badge">${data.category} &bull; ${data.status}</span>
+            <h2 class="modal-title">${data.title}</h2>
+            <p class="modal-desc">${data.description}</p>
+            
+            <div class="modal-section">
+                <h3>Architecture & Tech Stack</h3>
+                <div class="modal-stacks-grid">${stacksHtml}</div>
+            </div>
+
+            <div class="modal-section">
+                <h3>Key Features</h3>
+                <ul class="modal-features-list">${featuresHtml}</ul>
+            </div>
+
+            <div class="modal-actions">
+                ${data.liveUrl ? `
+                <a href="${data.liveUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Visit Live Website
+                </a>
+                ` : ''}
+                <a href="${data.link}" target="_blank" rel="noopener noreferrer" class="btn btn-outline">
+                    <i class="fa-brands fa-github"></i> View GitHub Repository
+                </a>
+            </div>
+        `;
+
+        modal.classList.add("active");
+        document.body.style.overflow = "hidden";
+    }
+
+    function closeModal() {
+        if (!modal) return;
+        modal.classList.remove("active");
+        document.body.style.overflow = "";
+    }
+
+    viewBtns.forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            e.preventDefault();
+            const pid = btn.getAttribute("data-project");
+            openModal(pid);
+        });
+    });
+
+    closeBtn?.addEventListener("click", closeModal);
+    modal?.addEventListener("click", (e) => {
+        if (e.target === modal) closeModal();
+    });
+    window.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && modal?.classList.contains("active")) closeModal();
+    });
+}
+
+/* --------------------------------------------------------------------------
+   14. DEVELOPER CLI INTERACTIVE TERMINAL
+   -------------------------------------------------------------------------- */
+function initTerminal() {
+    const triggerBtn = document.getElementById("terminal-trigger-btn");
+    const modal = document.getElementById("terminal-modal");
+    const closeBtn = document.getElementById("terminal-close-btn");
+    const closeDot = document.getElementById("terminal-close-dot");
+    const input = document.getElementById("terminal-input");
+    const output = document.getElementById("terminal-output");
+    const quickBtns = document.querySelectorAll(".quick-cmd-btn");
+
+    if (!modal || !input || !output) return;
+
+    function openTerminal() {
+        modal.classList.add("active");
+        document.body.style.overflow = "hidden";
+        setTimeout(() => input.focus(), 150);
+    }
+
+    function closeTerminal() {
+        modal.classList.remove("active");
+        document.body.style.overflow = "";
+    }
+
+    triggerBtn?.addEventListener("click", openTerminal);
+    closeBtn?.addEventListener("click", closeTerminal);
+    closeDot?.addEventListener("click", closeTerminal);
+    modal.addEventListener("click", (e) => {
+        if (e.target === modal) closeTerminal();
+    });
+
+    quickBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+            const cmd = btn.getAttribute("data-cmd");
+            if (cmd) executeCommand(cmd);
+        });
+    });
+
+    input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+            const cmd = input.value.trim();
+            if (cmd) {
+                executeCommand(cmd);
+                input.value = "";
+            }
+        }
+    });
+
+    function executeCommand(rawCmd) {
+        const cmd = rawCmd.trim().toLowerCase();
         
-        dot.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
+        const line = document.createElement("div");
+        line.className = "terminal-line user-input-line";
+        line.innerHTML = `<span class="prompt">tanish@dev:~$</span> <span class="cmd-text">${escapeHtml(rawCmd)}</span>`;
+        output.appendChild(line);
 
-        if (!isMoving) {
-            document.body.classList.add("custom-cursor-active");
-            isMoving = true;
-            renderCursorRing();
+        const resp = document.createElement("div");
+        resp.className = "terminal-line response-line";
+
+        switch (cmd) {
+            case "help":
+            case "?":
+                resp.innerHTML = `
+<span class="highlight">Available Commands:</span>
+  <span class="cmd-name">about</span>     - Summary about Tanish Sanchaniya
+  <span class="cmd-name">skills</span>    - Technical skills & proficiency breakdown
+  <span class="cmd-name">projects</span>  - List of featured projects & status
+  <span class="cmd-name">contact</span>   - Contact email, phone & social profiles
+  <span class="cmd-name">time</span>      - Current time in Surat, Gujarat (IST)
+  <span class="cmd-name">hire</span>      - Inquiry message & quick copy action
+  <span class="cmd-name">clear</span>     - Clear terminal screen
+  <span class="cmd-name">sudo</span>      - Gain root guest privileges
+`;
+                break;
+
+            case "about":
+            case "bio":
+                resp.innerHTML = `
+<span class="highlight">👨‍💻 Tanish Sanchaniya</span>
+  • Degree: BCA (5th Semester Completed)
+  • Institution: Sutex Bank College of Computer Application & Science
+  • Location: Surat, Gujarat, India
+  • Passion: Full-Stack Web Development, Clean Code & Database Systems
+`;
+                break;
+
+            case "skills":
+            case "tech":
+                resp.innerHTML = `
+<span class="highlight">🛠️ Technical Skill Matrix:</span>
+  • <span class="cmd-name">Frontend:</span> HTML5, CSS3, JavaScript (ES6+), React
+  • <span class="cmd-name">Backend:</span> Node.js, PHP, ASP.NET (C#)
+  • <span class="cmd-name">Databases:</span> MySQL, MongoDB
+  • <span class="cmd-name">Languages:</span> C, C++, Java, Python
+  • <span class="cmd-name">Tools:</span> Git, GitHub, VS Code
+`;
+                break;
+
+            case "projects":
+            case "work":
+                resp.innerHTML = `
+<span class="highlight">🚀 Featured Projects:</span>
+  1. <span class="cmd-name">Library Management System</span> [ASP.NET | PHP/MySQL | MERN]
+  2. <span class="cmd-name">Personal Portfolio Website</span> [HTML, CSS, Vanilla JS]
+  3. <a href="https://nehvisa-holiday.netlify.app/" target="_blank" class="term-link"><span class="cmd-name">Nehvisa Holidays</span></a> [Live Travel Platform - React, Vite, JS, HTML5, CSS3]
+`;
+                break;
+
+            case "contact":
+            case "email":
+                resp.innerHTML = `
+<span class="highlight">📬 Contact Information:</span>
+  • Email: <a href="mailto:sanchaniyatanish020@gmail.com" class="term-link">sanchaniyatanish020@gmail.com</a>
+  • Phone: +91 87584498557
+  • GitHub: <a href="https://github.com/sanchaniyatanish020-png" target="_blank" class="term-link">sanchaniyatanish020-png</a>
+  • LinkedIn: <a href="https://www.linkedin.com/in/tanishsanchaniya020/" target="_blank" class="term-link">tanishsanchaniya020</a>
+`;
+                break;
+
+
+            case "time":
+            case "date":
+                const now = new Date();
+                const timeString = new Intl.DateTimeFormat("en-US", {
+                    timeZone: "Asia/Kolkata",
+                    dateStyle: "full",
+                    timeStyle: "medium"
+                }).format(now);
+                resp.innerHTML = `🕒 Current Time (Surat, IST): <span class="highlight">${timeString}</span>`;
+                break;
+
+            case "hire":
+            case "sudo hire":
+                navigator.clipboard.writeText("sanchaniyatanish020@gmail.com");
+                resp.innerHTML = `🎉 Thank you for your interest! Email copied: <span class="highlight">sanchaniyatanish020@gmail.com</span>. Feel free to send a message!`;
+                showToast("📋 Email copied to clipboard!", "success");
+                break;
+
+            case "clear":
+            case "cls":
+                output.innerHTML = "";
+                return;
+
+            case "sudo":
+                resp.innerHTML = `🔐 <span class="highlight">ACCESS GRANTED.</span> Welcome Superuser! You have full access to explore Tanish's portfolio.`;
+                break;
+
+            default:
+                resp.innerHTML = `⚠️ Command not recognized: <span class="err-text">'${escapeHtml(cmd)}'</span>. Type <span class="cmd-highlight">help</span> for a list of available commands.`;
+                break;
         }
-    });
 
-    // Smooth lerping loop for ring follower
-    function renderCursorRing() {
-        if (!isMoving) return;
-
-        ringX += (mouseX - ringX) * 0.18;
-        ringY += (mouseY - ringY) * 0.18;
-
-        ring.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%, -50%)`;
-
-        requestAnimationFrame(renderCursorRing);
+        output.appendChild(resp);
+        
+        const terminalBody = document.getElementById("terminal-body");
+        if (terminalBody) {
+            terminalBody.scrollTop = terminalBody.scrollHeight;
+        }
     }
 
-    // Hide cursor when mouse leaves document window
-    document.addEventListener("mouseleave", () => {
-        document.body.classList.remove("custom-cursor-active");
-        isMoving = false;
-    });
-
-    // Hover effect on interactive UI components
-    const interactiveSelectors = "a, button, input, textarea, select, .project-card, .project-featured-card, .skill-category-card, .highlight-card, .timeline-card, .btn, .nav-logo, .hamburger";
-    
-    document.addEventListener("mouseover", (e) => {
-        if (e.target.closest(interactiveSelectors)) {
-            document.body.classList.add("cursor-hover");
-        }
-    });
-
-    document.addEventListener("mouseout", (e) => {
-        if (e.target.closest(interactiveSelectors)) {
-            document.body.classList.remove("cursor-hover");
-        }
-    });
-
-    // Click pulse animation
-    window.addEventListener("mousedown", () => {
-        document.body.classList.add("cursor-click");
-    });
-
-    window.addEventListener("mouseup", () => {
-        document.body.classList.remove("cursor-click");
-    });
+    function escapeHtml(str) {
+        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
 }

@@ -47,7 +47,7 @@ c:/tanish_port/
 5. **Projects**:
    - **Featured Main Project**: *Library Management System* (ASP.NET | PHP/MySQL | React/Node/MongoDB)
    - *Personal Portfolio Website*
-   - [Nehvisa Holidays | Best Travel Agency in Surat](https://nehvisa-holiday.netlify.app/) (Live Domestic & International Travel Website)
+   - [Nehvisa Holidays | Best Travel Agency in Surat | International Tour Packages](https://www.nehvisaholidays.com/) (Live Domestic & International Travel Website)
 6. **Contact**: Personal contact channels, social profiles (GitHub, LinkedIn), and mailto contact form.
 
 ---

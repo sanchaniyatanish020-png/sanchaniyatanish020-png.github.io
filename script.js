@@ -676,7 +676,7 @@ function initProjectModal() {
             link: "https://github.com/sanchaniyatanish020-png"
         },
         nehvisa: {
-            title: "Nehvisa Holidays | Best Travel Agency in Surat",
+            title: "Nehvisa Holidays | Best Travel Agency in Surat | International Tour Packages",
             category: "Web Application (React + Vite)",
             status: "Completed & Live",
             description: "A complete, live responsive travel agency web platform for Nehvisa Holidays built using React and Vite. Offers domestic and international tour packages, destination highlights, hotel & transport arrangements, and instant customer booking inquiry integration.",
@@ -684,7 +684,7 @@ function initProjectModal() {
                 { name: "Frontend Framework", desc: "React with modular component architecture" },
                 { name: "Build Tool & Bundler", desc: "Vite (Fast Hot Module Replacement & optimized build)" },
                 { name: "Core Languages", desc: "JavaScript (ES6+), HTML5, CSS3" },
-                { name: "Deployment", desc: "Netlify Production Hosting with Continuous Deployment" }
+                { name: "Deployment & Domain", desc: "Live custom production hosting at nehvisaholidays.com" }
             ],
             features: [
                 "Domestic & International tour packages showcase",
@@ -693,7 +693,7 @@ function initProjectModal() {
                 "Direct WhatsApp inquiry and quick booking contact integration",
                 "Destination highlights, detailed itineraries, and travel consultation"
             ],
-            liveUrl: "https://nehvisa-holiday.netlify.app/",
+            liveUrl: "https://www.nehvisaholidays.com/",
             link: "https://github.com/sanchaniyatanish020-png"
         }
     };
@@ -871,7 +871,7 @@ function initTerminal() {
 <span class="highlight">🚀 Featured Projects:</span>
   1. <span class="cmd-name">Library Management System</span> [ASP.NET | PHP/MySQL | MERN]
   2. <span class="cmd-name">Personal Portfolio Website</span> [HTML, CSS, Vanilla JS]
-  3. <a href="https://nehvisa-holiday.netlify.app/" target="_blank" class="term-link"><span class="cmd-name">Nehvisa Holidays</span></a> [Live Travel Platform - React, Vite, JS, HTML5, CSS3]
+  3. <a href="https://www.nehvisaholidays.com/" target="_blank" class="term-link"><span class="cmd-name">Nehvisa Holidays</span></a> [Live Travel Platform - React, Vite, JS, HTML5, CSS3]
 `;
                 break;
 
